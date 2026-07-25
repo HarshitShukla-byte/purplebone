@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout } from "../components/site-layout";
 import { useState, type FormEvent } from "react";
-import { Phone, Mail, MapPin, Send, CheckCircle2, PawPrint, Instagram } from "lucide-react";
+import { Phone, Mail, MapPin, Send, CheckCircle2, PawPrint, Instagram, CalendarCheck, Scissors, Stethoscope, Heart } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -18,13 +19,30 @@ export const Route = createFileRoute("/contact")({
 function Contact() {
   const [sent, setSent] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [appt, setAppt] = useState({ name: "", phone: "", service: "Meet & greet", date: "", time: "11:00" });
+  const [apptDone, setApptDone] = useState(false);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
     setSent(true);
+    toast.success("Message sent 💌", { description: "We'll reply within a few hours." });
     setForm({ name: "", email: "", phone: "", message: "" });
     setTimeout(() => setSent(false), 5000);
   };
+
+  const bookAppt = (e: FormEvent) => {
+    e.preventDefault();
+    setApptDone(true);
+    toast.success("Appointment booked! 🐾", {
+      description: `${appt.service} on ${appt.date} at ${appt.time}`,
+    });
+    setAppt({ name: "", phone: "", service: "Meet & greet", date: "", time: "11:00" });
+    setTimeout(() => setApptDone(false), 6000);
+  };
+
+  const today = new Date().toISOString().split("T")[0];
+  const services = ["Meet & greet", "Grooming spa", "Vet consult", "Home delivery"] as const;
+  const serviceIcon = { "Meet & greet": Heart, "Grooming spa": Scissors, "Vet consult": Stethoscope, "Home delivery": PawPrint };
 
   return (
     <SiteLayout>
@@ -133,6 +151,101 @@ function Contact() {
             </button>
             {sent && <p className="mt-3 text-center text-sm text-primary">We'll get back to you within a few hours. 💜</p>}
           </form>
+        </div>
+
+        {/* APPOINTMENT BOOKING */}
+        <div id="book" className="mt-20 rounded-[2.5rem] bg-card border border-border p-8 md:p-12 shadow-sm">
+          <div className="grid gap-8 md:grid-cols-2 items-start">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full bg-accent/50 text-accent-foreground px-3 py-1 text-xs font-bold uppercase tracking-wider">
+                <CalendarCheck className="h-3.5 w-3.5" /> Book a visit
+              </span>
+              <h2 className="mt-4 font-display font-bold text-4xl md:text-5xl leading-tight">
+                Reserve your <span className="text-primary">purple hour</span>.
+              </h2>
+              <p className="mt-4 text-muted-foreground">
+                Meet a pet, drop off your bestie for grooming, book a vet, or schedule home delivery. Free cancellation up to 4h before your slot.
+              </p>
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                {services.map((s) => {
+                  const Icon = serviceIcon[s];
+                  const active = appt.service === s;
+                  return (
+                    <button
+                      key={s}
+                      onClick={() => setAppt({ ...appt, service: s })}
+                      className={`flex items-center gap-2 rounded-2xl border-2 px-4 py-3 text-sm font-semibold text-left transition-all ${
+                        active
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4 shrink-0" /> {s}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <form onSubmit={bookAppt} className="bg-background rounded-3xl p-6 border border-border">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block">
+                  <span className="text-sm font-semibold">Name</span>
+                  <input
+                    required
+                    value={appt.name}
+                    onChange={(e) => setAppt({ ...appt, name: e.target.value })}
+                    className="mt-1 w-full rounded-2xl border border-border bg-background px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
+                    placeholder="Your name"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold">Phone</span>
+                  <input
+                    required
+                    value={appt.phone}
+                    onChange={(e) => setAppt({ ...appt, phone: e.target.value })}
+                    className="mt-1 w-full rounded-2xl border border-border bg-background px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
+                    placeholder="+91 98xxxxxxxx"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold">Date</span>
+                  <input
+                    required
+                    type="date"
+                    min={today}
+                    value={appt.date}
+                    onChange={(e) => setAppt({ ...appt, date: e.target.value })}
+                    className="mt-1 w-full rounded-2xl border border-border bg-background px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold">Time</span>
+                  <select
+                    value={appt.time}
+                    onChange={(e) => setAppt({ ...appt, time: e.target.value })}
+                    className="mt-1 w-full rounded-2xl border border-border bg-background px-4 py-3 outline-none focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
+                  >
+                    {["10:00", "11:00", "12:00", "14:00", "15:00", "16:00", "17:00", "18:00"].map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <button
+                type="submit"
+                className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground px-6 py-4 font-bold shadow-lg shadow-primary/30 hover:scale-[1.02] transition-transform"
+              >
+                {apptDone ? <><CheckCircle2 className="h-5 w-5" /> Booked!</> : <><CalendarCheck className="h-4 w-4" /> Confirm booking</>}
+              </button>
+              {apptDone && (
+                <p className="mt-3 text-center text-sm text-primary">
+                  See you soon! We'll text a confirmation shortly. 💜
+                </p>
+              )}
+            </form>
+          </div>
         </div>
       </section>
     </SiteLayout>
