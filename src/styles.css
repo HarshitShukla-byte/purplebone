@@ -4,6 +4,38 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --font-display: "Fredoka", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-wiggle: wiggle 1.2s ease-in-out infinite;
+  --animate-blob: blob 12s ease-in-out infinite;
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-bounce-slow: bounce-slow 3s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-14px); }
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-4deg); }
+    50% { transform: rotate(4deg); }
+  }
+  @keyframes blob {
+    0%, 100% { border-radius: 42% 58% 63% 37% / 45% 42% 58% 55%; }
+    50% { border-radius: 60% 40% 32% 68% / 55% 62% 38% 45%; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+}
+
 /*
  * Design system definition.
  *
