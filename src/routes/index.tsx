@@ -8,8 +8,8 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Purple Bone Pet Shop — South Delhi's Cutest Pet Family" },
       { name: "description", content: "Meet your new best friend at Purple Bone — puppies, kittens, grooming, food & love in South Delhi." },
-      { property: "og:title", content: "Purple Bone Pet Shop" },
-      { property: "og:description", content: "South Delhi's cutest pet family. Adopt, groom, and glow up your bestie." },
+      { property: "og:title", content: "Purple Bone Pet Shop — South Delhi's Cutest Pet Family" },
+      { property: "og:description", content: "Meet your new best friend at Purple Bone — puppies, kittens, grooming, food & love in South Delhi." },
     ],
   }),
   component: Home,
