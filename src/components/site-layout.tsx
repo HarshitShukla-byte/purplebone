@@ -1,6 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { PawPrint, Menu, X, Instagram, Phone } from "lucide-react";
+import { PawPrint, Menu, X, Instagram, Phone, ShoppingBag, Heart } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { useShop } from "../lib/shop-store";
+import { CartDrawer, WishlistDrawer } from "./shop-drawers";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -12,7 +14,11 @@ const NAV = [
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [wishOpen, setWishOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { cartCount, state } = useShop();
+  const wishCount = state.wishlist.length;
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden">
@@ -53,20 +59,45 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             })}
           </nav>
 
-          <Link
-            to="/contact"
-            className="hidden md:inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:scale-105 transition-transform"
-          >
-            <Phone className="h-4 w-4" /> Book a Call
-          </Link>
-
-          <button
-            className="md:hidden grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary"
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Toggle menu"
-          >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setWishOpen(true)}
+              className="relative grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition"
+              aria-label="Open wishlist"
+            >
+              <Heart className="h-5 w-5" />
+              {wishCount > 0 && (
+                <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-accent text-accent-foreground text-[10px] font-bold px-1">
+                  {wishCount}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition"
+              aria-label="Open cart"
+            >
+              <ShoppingBag className="h-5 w-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold px-1">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+            <Link
+              to="/contact"
+              className="hidden md:inline-flex items-center gap-2 rounded-full bg-foreground text-background px-4 py-2 text-sm font-semibold hover:scale-105 transition-transform ml-1"
+            >
+              <Phone className="h-4 w-4" /> Book
+            </Link>
+            <button
+              className="md:hidden grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary"
+              onClick={() => setOpen((v) => !v)}
+              aria-label="Toggle menu"
+            >
+              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
 
         {open && (
@@ -95,6 +126,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       </header>
 
       <main>{children}</main>
+
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <WishlistDrawer open={wishOpen} onClose={() => setWishOpen(false)} onOpenCart={() => setCartOpen(true)} />
 
       <footer className="mt-24 border-t border-border/60 bg-background/60 backdrop-blur">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 py-12 grid gap-8 md:grid-cols-3">
